@@ -3,6 +3,8 @@ import Vapor
 /// Register your application's routes here.
 public func routes(_ router: Router) throws {
     // Basic "It works" example
+    RCLController(router:router)
+    ETHController(router:router)
     router.get { req in
         return "It works!"
     }

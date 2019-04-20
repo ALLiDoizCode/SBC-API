@@ -16,7 +16,7 @@ enum ClientRoute {
                 httpReq.body = HTTPBody(data: try blockchain.data())
                 return httpReq
             case .submitETH(let blockchain):
-                httpReq = HTTPRequest(method: .POST, url: "ETH_URL_Test\(try blockchain.endpoint())") 
+                httpReq = HTTPRequest(method: .POST, url: "\(ETH_URL_Test)\(try blockchain.endpoint())") 
                 return httpReq       
             case .submitBTC(let tx):
                 httpReq = HTTPRequest(method: .POST, url: BTC_URL_TEST)

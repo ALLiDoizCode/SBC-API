@@ -49,6 +49,9 @@ enum ETH {
     case submitETH(blob:String)
     case balance(address:String)
     case transactionCount(address:String)
+    case transaction(hash:String)
+    case history(address:String,start:Int,end:Int)
+    case currentBlock
 
     func endpoint() throws -> String {
         switch self {
@@ -57,7 +60,13 @@ enum ETH {
             case .balance(let address):
                 return "module=account&action=balance&address=\(address)&tag=latest&apikey=\(ETH_API_TOKEN)"
             case .transactionCount(let address):
-                return "module=proxy&action=eth_getTransactionCount&address=\(address)&tag=latest&apikey=\(ETH_API_TOKEN)"  
+                return "module=proxy&action=eth_getTransactionCount&address=\(address)&tag=latest&apikey=\(ETH_API_TOKEN)" 
+            case .transaction(let hash):
+                return "module=proxy&action=eth_getTransactionByHash&txhash=\(hash)&apikey=\(ETH_API_TOKEN)"
+            case .history(let address,let start,let end):
+                return "module=account&action=txlist&address=\(address)&startblock=\(start)&endblock=\(end)&sort=asc&apikey=\(ETH_API_TOKEN)"
+            case .currentBlock:
+                return "module=proxy&action=eth_blockNumber&apikey=\(ETH_API_TOKEN)"          
         }
     }
 }

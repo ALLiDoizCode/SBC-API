@@ -5,7 +5,7 @@ enum ClientRoute {
     
     case submitRCL(blockchain:XRP)
     case submitETH(blockchain:ETH)
-    case submitBTC(tx:String)
+    case submitBTC(blockchain:BTC)
 
     func request() throws -> HTTPRequest {
         var httpReq = HTTPRequest()
@@ -18,8 +18,9 @@ enum ClientRoute {
             case .submitETH(let blockchain):
                 httpReq = HTTPRequest(method: .POST, url: "\(ETH_URL_Test)\(try blockchain.endpoint())") 
                 return httpReq       
-            case .submitBTC(let tx):
-                httpReq = HTTPRequest(method: .POST, url: BTC_URL_TEST)
+            case .submitBTC(let blockchain):
+                httpReq = HTTPRequest(method: .POST, url: "\(BTC_URL_TEST)txs/push?token=\(BLOCKCYPHER_API_TOKEN)")
+                httpReq.body = HTTPBody(data: try blockchain.data())
                 return httpReq    
         }
         
@@ -56,17 +57,30 @@ enum ETH {
     func endpoint() throws -> String {
         switch self {
             case .submitETH(let blob):
-                return "module=proxy&action=eth_sendRawTransaction&hex=\(blob)&apikey=\(ETH_API_TOKEN)"
+                return "module=proxy&action=eth_sendRawTransaction&hex=\(blob)&apikey=\(BLOCKCYPHER_API_TOKEN)"
             case .balance(let address):
-                return "module=account&action=balance&address=\(address)&tag=latest&apikey=\(ETH_API_TOKEN)"
+                return "module=account&action=balance&address=\(address)&tag=latest&apikey=\(BLOCKCYPHER_API_TOKEN)"
             case .transactionCount(let address):
-                return "module=proxy&action=eth_getTransactionCount&address=\(address)&tag=latest&apikey=\(ETH_API_TOKEN)" 
+                return "module=proxy&action=eth_getTransactionCount&address=\(address)&tag=latest&apikey=\(BLOCKCYPHER_API_TOKEN)" 
             case .transaction(let hash):
-                return "module=proxy&action=eth_getTransactionByHash&txhash=\(hash)&apikey=\(ETH_API_TOKEN)"
+                return "module=proxy&action=eth_getTransactionByHash&txhash=\(hash)&apikey=\(BLOCKCYPHER_API_TOKEN)"
             case .history(let address,let start,let end):
-                return "module=account&action=txlist&address=\(address)&startblock=\(start)&endblock=\(end)&sort=asc&apikey=\(ETH_API_TOKEN)"
+                return "module=account&action=txlist&address=\(address)&startblock=\(start)&endblock=\(end)&sort=asc&apikey=\(BLOCKCYPHER_API_TOKEN)"
             case .currentBlock:
-                return "module=proxy&action=eth_blockNumber&apikey=\(ETH_API_TOKEN)"          
+                return "module=proxy&action=eth_blockNumber&apikey=\(BLOCKCYPHER_API_TOKEN)"          
+        }
+    }
+}
+
+enum BTC {
+    case submitBTC(blob:String)
+    func data() throws -> Data {
+        let encoder = JSONEncoder()
+        switch self {
+            case .submitBTC(let blob):
+                let tx_blob = BTC_Blob(tx:blob)
+                let data = try encoder.encode(tx_blob)
+                return data
         }
     }
 }

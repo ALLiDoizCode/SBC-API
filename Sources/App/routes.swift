@@ -5,6 +5,7 @@ public func routes(_ router: Router) throws {
     // Basic "It works" example
     RCLController(router:router)
     ETHController(router:router)
+    RCLController(router:router)
     router.get { req in
         return "It works!"
     }
